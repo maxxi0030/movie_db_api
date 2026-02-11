@@ -1,137 +1,150 @@
 # Movie API Research Project
 
-Comparative analysis of movie/TV show APIs for retrieving cast information and metadata.
+Исследовательский проект по сравнению API кино- и ТВ-баз данных для получения информации об актёрах, персонажах и метаданных.
 
-## 📋 Project Overview
+---
 
-This project was developed as part of a practical research assignment to evaluate different movie database APIs and determine the most suitable solution for obtaining detailed cast information for films and TV series.
 
-## 🎯 Research Goals
+Цель — выбрать оптимальное решение для получения детальной информации о фильмах и сериалах.
 
-- Compare functionality of various movie APIs (TMDB, OMDB, IMDB, TVmaze, TheTVDB)
-- Evaluate data quality (cast completeness, character roles, metadata)
-- Analyze pricing models and request limits
-- Develop proof-of-concept applications
+По результатам анализа выбран **TMDB API** как наиболее сбалансированное решение.
 
-## 📁 Project Structure
+---
+
+## Структура проекта
 
 ```
 .
-├── app.py           # TMDB API implementation (recommended solution)
-├── script.py        # TVmaze & TheTVDB API comparison
-├── requirements.txt # Python dependencies
-└── README.md        # This file
+├── app.py           # Основное приложение (TMDB API)
+├── script.py        # Сравнение TVmaze и TheTVDB
+├── requirements.txt # Зависимости
+└── README.md        # Документация
 ```
 
-## 🔧 Applications
+---
 
-### 1. TMDB Application (app.py) ⭐ Recommended
+## app.py - ТУТ TMDB
+<img width="1666" height="976" alt="api-TMDB" src="https://github.com/user-attachments/assets/13ea87fa-4d54-4876-9bbf-8acbc1ca906b" />
 
-**Why TMDB?**
-- Complete cast information with character roles
-- Support for both movies and individual TV episodes
-- Free API for non-commercial use with sufficient limits
-- High-quality posters and rich metadata
-- REST API with JSON responses
 
-**Features:**
-- Search movies and TV shows by title
-- View detailed cast information with character names
-- Display posters and episode stills
-- Gender indicators for actors (♀️/♂️)
-- Clean Bootstrap UI
+### Возможности
 
-**Usage:**
+- Поиск фильма или сериала по названию  
+- Получение списка актёров и их персонажей  
+- Отображение постеров (фильмы) и кадров эпизодов (сериалы)  
+- Поддержка выбора сезона и серии  
+- Объединение основной и приглашённой касты для сериалов  
+
+---
+
+## Особенности работы с TMDB API
+
+### Фильмы
+
+Используется запрос:
+
+```
+/movie/{id}?append_to_response=credits
+```
+
+Каста доступна в:
+
+```
+credits.cast
+```
+
+Для фильмов дополнительная обработка не требуется.
+
+---
+
+### Сериалы (важная особенность)
+
+Для сериалов данные запрашиваются на уровне эпизода:
+
+```
+/tv/{id}/season/{season}/episode/{episode}?append_to_response=credits
+```
+
+**Особенность TMDB:**
+
+- Основная каста не всегда полностью указывается в каждой серии  
+- Некоторые актёры появляются только как `guest_stars`  
+- Список актёров может отличаться от серии к серии  
+
+Поэтому в проекте объединяются:
+
+- `credits.cast`
+- `credits.guest_stars`
+
+```python
+all_actors = guest_stars + cast
+```
+
+Это позволяет корректно отображать всех актёров конкретного эпизода.
+
+---
+
+## Установка и запуск
+
+### 1. Установка зависимостей
+
 ```bash
 pip install -r requirements.txt
-python app.py
-# Open http://localhost:5000
 ```
-
-**Example searches:**
-- Movies: "Inception", "The Matrix"
-- TV Shows: "Breaking Bad" (specify season/episode)
 
 ---
 
-### 2. API Comparison Tool (script.py)
+### 2. Получение API-ключа TMDB
 
-Compares TVmaze and TheTVDB APIs for TV series data.
+1. Зарегистрироваться на [https://www.themoviedb.org/](https://www.themoviedb.org/)
+2. Перейти: **Settings → API → Request API Key**
+3. Вставить ключ в `app.py`:
 
-**Features:**
-- Side-by-side comparison of API responses
-- Cast information from both sources
-- Guest stars vs. regular cast differentiation
+```python
+API_KEY = "ваш_ключ"
+```
 
-**Usage:**
+**Внимание:** Не публикуйте API-ключ в открытых репозиториях.
+
+---
+
+### 3. Запуск приложения
+
+```bash
+python app.py
+```
+
+Открыть в браузере:
+
+```
+http://localhost:5000
+```
+
+---
+
+## script.py -  ТУТ TVmaze и TheTVDB
+<img width="1683" height="975" alt="api-TVmaze" src="https://github.com/user-attachments/assets/e39dc307-f080-4c51-8b0f-887b73f6a536" />
+
+<img width="1691" height="974" alt="api-TheTVDB" src="https://github.com/user-attachments/assets/23dbadc2-3f96-4b70-b318-caa681e97e72" />
+
+Сравнение API TVmaze и TheTVDB:
+
 ```bash
 python script.py
-# Open http://localhost:5000
-# Select API: TVmaze or TheTVDB
 ```
 
-**Note:** TheTVDB requires a valid authentication token (included token may expire).
+Требуется действующий токен TheTVDB (может истекать).
 
 ---
 
-## 📊 API Comparison Results
+## Вывод
 
-| API | Cost | Cast Data | Metadata | Best For |
-|-----|------|-----------|----------|----------|
-| **TMDB** | Free (non-commercial) | ✅ Excellent | ✅ Rich | Movies + TV episodes |
-| **OMDB** | Free tier limited | ⚠️ Basic | ⚠️ Ratings only | Quick lookups |
-| **IMDB Official** | $150k+/year | ✅ Complete | ✅ Complete | Enterprise only |
-| **TVmaze** | Free | ✅ Good | ✅ Good | TV shows only |
-| **TheTVDB** | Free tier | ✅ Good | ✅ Good | TV shows only |
+TMDB API выбран благодаря:
 
-## 🏆 Conclusion
+* Подробным данным об актёрах и персонажах
+* Поддержке фильмов и отдельных эпизодов сериалов
 
-**TMDB API** was selected as the optimal solution due to:
-- Best balance of features and cost
-- Comprehensive cast/character data
-- Excellent documentation and reliability
-- Active community support
-
-## 🔑 API Keys
-
-To run these applications, you need:
-
-1. **TMDB API Key** (app.py):
-   - Register at https://www.themoviedb.org/
-   - Go to Settings → API → Request API Key
-   - Replace `API_KEY` in `app.py`
-
-2. **TheTVDB Token** (script.py):
-   - Register at https://www.thetvdb.com/
-   - Get API key from dashboard
-   - Token expires periodically (needs refresh)
-
-## 📦 Dependencies
-
-```
-Flask==3.0.0
-requests==2.31.0
-```
-
-## 🖼️ Screenshots
-
-### TMDB Application
-- Search interface with season/episode selectors
-- Movie/TV show results with posters
-- Detailed cast list with character roles
-- Responsive Bootstrap design
-
-## 📝 Notes
-
-- Both applications are for educational/research purposes
-- API keys included in code are for demonstration only
-- Follow API terms of service for production use
-- TMDB requires attribution link in production apps
-
-## 👨‍💻 Author
-
-Developed during practical training assignment focused on API integration and comparative analysis.
 
 ---
 
-**License:** Educational use only
+Проект выполнен в учебных целях в рамках практики по работе с REST API и интеграции внешних сервисов.
